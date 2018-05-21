@@ -14,6 +14,7 @@ numbers from 1 to 20?
 
 import time
 from datetime import timedelta
+from functools import reduce
 
 
 def problem5(n):
@@ -30,10 +31,7 @@ def gcd(x, y):
 
 def gcd_list(lst):
     """Find gcd for any number of integers."""
-    res = lst[0]
-    for i in lst[1:]:
-        res = gcd(res, i)
-    return res
+    return reduce(gcd, lst)
 
 
 def lcm(x, y):
@@ -43,10 +41,7 @@ def lcm(x, y):
 
 def lcm_list(lst):
     """Find lcm for any number of integers."""
-    res = lst[0]
-    for i in lst[1:]:
-        res = lcm(res, i)
-    return res
+    return reduce(lcm, lst)
 
 
 def time_and_print(func, arg, expectation):
@@ -107,4 +102,8 @@ time_and_print(problem5, [17], 12252240)
 time_and_print(problem5, [18], 12252240)
 time_and_print(problem5, [19], 232792560)
 time_and_print(problem5, [20], 232792560)
+time_and_print(problem5, [100], 312407341776354014834072243597373389403112974556867619398435671775959632070648403268524827223839997952)
+
+# Limit for python, anything above it triggers overflow error
+time_and_print(problem5, [216], 52503908205228064815745545773254926275415249958052793967874402432056016303463623443515191694965299141695680828177190585805551209390275757682590502543120903143361355477849812695222329140533883691651398193528968197001697059419802198276640075180420531485144161679970139414339513796435983831967523325240615632896)
 
