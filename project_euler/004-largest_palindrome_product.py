@@ -11,8 +11,7 @@ Find the largest palindrome made from the product of two 3-digit numbers.
 """
 
 
-import time
-from datetime import timedelta
+import pe_utils
 
 
 def lp(n):
@@ -33,37 +32,10 @@ def is_palindrome(n):
     return True if n == "".join(reversed(n)) else False
 
 
-def time_and_print(func, arg, expectation):
-    """
-    Call function, check correctness,
-    time its execution and print results.
-    """
-    GREEN = "\033[92m"
-    RED = "\033[0;31m"
-    END = "\033[0m"
-    t1 = time.process_time()
-    res = func(arg)
-    t2 = time.process_time() - t1
-    if res == expectation:
-        print(GREEN, func.__name__, END, "for", arg)
-    else:
-        print(RED, func.__name__, END)
-    print("    ", rpad(res), "vs", lpad(expectation), "time:", timedelta(seconds=t2))
-    print()
-
-
-def rpad(i, n = 8):
-    return str(i).rjust(n)
-
-
-def lpad(i, n = 8):
-    return str(i).ljust(n)
-
-
-time_and_print(is_palindrome, 2, True)
-time_and_print(is_palindrome, 23, False)
-time_and_print(is_palindrome, 232, True)
-time_and_print(lp, 2, 9009)
-time_and_print(lp, 3, 906609)
-time_and_print(lp, 4, 99000099)
+pe_utils.test(is_palindrome, [2], True)
+pe_utils.test(is_palindrome, [23], False)
+pe_utils.test(is_palindrome, [232], True)
+pe_utils.test(lp, [2], 9009)
+pe_utils.test(lp, [3], 906609)
+pe_utils.test(lp, [4], 99000099)
 

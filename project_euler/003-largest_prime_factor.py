@@ -10,8 +10,7 @@ What is the largest prime factor of the number 600851475143 ?
 """
 
 
-import time
-from datetime import timedelta
+import pe_utils
 
 
 def lpf_naive(n):
@@ -23,6 +22,28 @@ def lpf_naive(n):
             n /= current_prime
             largest_prime = current_prime
     return largest_prime
+
+
+def is_prime(n):
+    """
+    Checks if the number is a prime.
+    """
+    if n == 0 or n == 1:
+        return False
+    for i in range(n - 1, 1, -1):
+        if n % i == 0:
+            return False
+    return True
+
+
+def next_prime(n):
+    """
+    Returns next prime number n + x.
+    """
+    while True:
+        n += 1
+        if is_prime(n):
+            return n
 
 
 def lpf_fast(n):
@@ -49,65 +70,17 @@ def lpf_faster(n):
     return i
 
 
-def is_prime(n):
-    """
-    Checks if the number is a prime.
-    """
-    if n == 0 or n == 1:
-        return False
-    for i in range(n - 1, 1, -1):
-        if n % i == 0:
-            return False
-    return True
-
-
-def next_prime(n):
-    """
-    Returns next prime number n + x.
-    """
-    while True:
-        n += 1
-        if is_prime(n):
-            return n
-
-
-def time_and_print(func, arg, expectation):
-    """
-    Call function, check correctness,
-    time its execution and print results.
-    """
-    GREEN = "\033[92m"
-    RED = "\033[0;31m"
-    END = "\033[0m"
-    t1 = time.process_time()
-    res = func(arg)
-    t2 = time.process_time() - t1
-    if res == expectation:
-        print(GREEN, func.__name__, END)
-    else:
-        print(RED, func.__name__, END)
-    print("    ", rpad(res), "vs", lpad(expectation), "time:", timedelta(seconds=t2))
-
-
-def rpad(i, n = 8):
-    return str(i).rjust(n)
-
-
-def lpad(i, n = 8):
-    return str(i).ljust(n)
-
-
-time_and_print(lpf_naive, 13195, 29)
-# time_and_print(lpf_naive, 600851475143, 6857)
-# time_and_print(lpf_naive, 600851475142, 22567)
+pe_utils.test(lpf_naive, [13195], 29)
+# pe_utils.test(lpf_naive, [600851475143], 6857)
+# pe_utils.test(lpf_naive, [600851475142], 22567)
 print("-----")
-time_and_print(lpf_fast, 600851475143, 6857)
-time_and_print(lpf_fast, 600851475142, 22567)
-time_and_print(lpf_fast, 234783486, 1863361)
-time_and_print(lpf_fast, 876426, 79)
+pe_utils.test(lpf_fast, [600851475143], 6857)
+pe_utils.test(lpf_fast, [600851475142], 22567)
+pe_utils.test(lpf_fast, [234783486], 1863361)
+pe_utils.test(lpf_fast, [876426], 79)
 print("-----")
-time_and_print(lpf_faster, 600851475143, 6857)
-time_and_print(lpf_faster, 600851475142, 22567)
-time_and_print(lpf_faster, 234783486, 1863361)
-time_and_print(lpf_faster, 876426, 79)
+pe_utils.test(lpf_faster, [600851475143], 6857)
+pe_utils.test(lpf_faster, [600851475142], 22567)
+pe_utils.test(lpf_faster, [234783486], 1863361)
+pe_utils.test(lpf_faster, [876426], 79)
 

@@ -14,14 +14,14 @@ four million, find the sum of the even-valued terms.
 """
 
 
-import time
+import pe_utils
 
 
-def even_fib():
+def even_fib(lim):
     s = 0
     i = 0
     j = 1
-    while i < 4000000:
+    while i < lim:
         if i % 2 == 0:
             s += i
         i, j = next_fib(i, j)
@@ -36,20 +36,5 @@ def next_fib(i, j):
     return j, j + i
 
 
-def time_and_print(func):
-    """
-    Call function, time its execution
-    and print results.
-    """
-    GREEN = "\033[92m"
-    RED = "\033[0;31m"
-    END = "\033[0m"
-    t1 = time.process_time()
-    res = func()
-    t2 = time.process_time() - t1
-    print(func.__name__)
-    print("    Result:", GREEN, res, END, "time:", t2)
-
-
-time_and_print(even_fib)
+pe_utils.test(even_fib, [4000000], 4613732)
 

@@ -1,3 +1,4 @@
 **/nodeschool/**/node_modules
 **/nodeschool/**/package-lock.json
+__pycache__/
 
