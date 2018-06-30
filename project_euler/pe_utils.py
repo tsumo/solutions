@@ -69,3 +69,18 @@ def quick_sum_of_squares(n):
     """Quickly computes sum of squares of all integers from 1 to n."""
     return (n / 6) * (2 * n + 1) * (n + 1)
 
+
+def sieve_of_eratosthenes(n):
+    """
+    Finds all prime numbers up to a given limit.
+    Works pretty fast up to a 10 000 000.
+    """
+    primes = []
+    non_primes = set()
+    for i in range(2, n + 1):
+        if i not in non_primes:
+            primes.append(i)
+            for j in range(i, n + 1, i):
+                non_primes.add(j)
+    return primes
+
