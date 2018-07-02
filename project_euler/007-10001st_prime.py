@@ -19,13 +19,14 @@ def problem7(n):
     """
     It has been proven that nth prime lies between
     n * ln(n) + n * ln(ln(n) - 1) and n * ln(n) + n * ln(ln(n))
-    for n >= 6. This gives us an upper limit for sieve.
+    for n >= 6. This gives us an upper limit for the sieve.
     """
     if n >= 6:
         upper_limit = int(n * log(n) + n * log(log(n)))
         return pe_utils.sieve_of_eratosthenes(upper_limit)[n - 1]
     else:
         return pe_utils.sieve_of_eratosthenes(13)[n - 1]
+
 
 pe_utils.test(problem7, [1], 2)
 pe_utils.test(problem7, [6], 13)

@@ -19,7 +19,7 @@ def test(func, arg, expectation):
     if res == expectation:
         print(GREEN, func.__name__, END, "for", arg)
     else:
-        print(RED, func.__name__, END)
+        print(RED, func.__name__, END, "for", arg)
     print("    ", rpad(res), "vs", lpad(expectation), "time:", timedelta(seconds=t2))
     print()
 
