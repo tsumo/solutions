@@ -61,7 +61,22 @@ def lcm_list(lst):
 
 
 def quick_sum(n):
-    """Quickly computes sum of all integers from 1 to n."""
+    """
+    Quickly computes sum of all integers from 1 to n.
+
+    1 + 2 + 3 = 6
+
+    o
+    o o
+    o o o
+
+    (3 * 4) / 2 = 6
+
+    ┌──4──┐
+    o x x x ┐
+    o o x x 3
+    o o o x ┘
+    """
     return n * (n + 1) / 2
 
 
