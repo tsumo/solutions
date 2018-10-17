@@ -9,13 +9,14 @@ nums = {1: 1, 2: 1}
 def fib(n):
     global nums
 
-    if n in nums:
+    if n in nums:               # If value was previously calculated
         return nums[n]
 
-    num = nums[n-1] + nums[n-2]
-    nums[n] = num
+    num = fib(n-1) + fib(n-2)   # Find recursively
+
+    nums[n] = num               # Memoize new value
+
     return num
 
-for i in range(1, 1000):
-    print(fib(i))
+print(fib(1000))
 
