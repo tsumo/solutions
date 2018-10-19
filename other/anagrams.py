@@ -17,6 +17,6 @@ def anagrams(s1, s2):
             return False
     return True
 
-print(anagrams('anagram', 'nagaram'))
-print(anagrams('qwerty', 'qwertu'))
+assert anagrams('anagram', 'nagaram') == True
+assert anagrams('qwerty', 'qwertu') == False
 
