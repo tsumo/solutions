@@ -12,12 +12,12 @@
 (defun react-polymer (str)
   "Fully react given polymer."
   (do ((i 0))
-      ((>= i (- (length str) 1)) str) ;; end condition and return form
+      ((>= i (- (length str) 1)) str) ; end condition and return form
       (let ((curr (char str i))
             (next (char str (+ i 1))))
         (if (react-p curr next)
             (progn (setf str (remove-pair str i))
-                   (setf i (max 0 (- i 1)))) ;; carefull not to get negative index
+                   (setf i (max 0 (- i 1)))) ; carefull not to get negative index
             (incf i)))))
 
 (defun construct-unit-database (polymer)
