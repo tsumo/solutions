@@ -25,3 +25,8 @@
   (loop for n from min below max by step
         collect n))
 
+(defun hash-table-keys (ht)
+  "Returns a list of hash table keys."
+  (loop for key being the hash-keys of ht
+        collect key))
+
