@@ -3,6 +3,7 @@
 import time
 from datetime import timedelta
 from functools import reduce
+import math
 
 
 def test(func, arg, expectation):
@@ -98,4 +99,23 @@ def sieve_of_eratosthenes(n):
             for j in range(i, n + 1, i):
                 non_primes.add(j)
     return primes
+
+
+def divisors(n):
+    """
+    Finds all divisors of the natural number.
+
+    Divisors are alway present in pairs of (n, x/n).
+    For example, when x = 100:
+        (1, 100), (2, 50), (4, 25), (5, 20), (10, 10)
+
+    That means that we only have to go up to sqrt(x) to find all pairs of
+    divisors.
+    """
+    divisors = set()
+    for i in range(1, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            divisors.add(i)
+            divisors.add(n / i)
+    return divisors
 
