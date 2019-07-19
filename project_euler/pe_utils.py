@@ -119,3 +119,14 @@ def divisors(n):
             divisors.add(n / i)
     return divisors
 
+
+def digit_sum(n):
+    """
+    Sum of all digits in a number.
+    """
+    s = 0
+    while n:
+        s += n % 10
+        n //= 10
+    return s
+
