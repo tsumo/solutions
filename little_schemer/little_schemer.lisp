@@ -1045,6 +1045,7 @@
   "Shifts to the right elements of a pair,
    each element could also be a pair.
    pora means pair or atom.
+   Total function - yields a value for every argument.
    Example call:
    (align '(2 ((3 4) 3)))"
   (cond ((atom? pora) pora)
@@ -1067,7 +1068,8 @@
 
 (defun shuffle (pora)
   "Shuffles elements of a pair if the first component
-   is a pair. Partial function. Enters an infinite loop
+   is a pair.
+   Partial function - enters an infinite loop
    when both components are pairs."
   (cond ((atom? pora) pora)
         ((a-pair? (first_ pora))
@@ -1089,10 +1091,9 @@
               (A n (sub1 m))))))
 
 (defun will-stop? (f)
-  "Checks if the function stops when it's called with
-   nil as the argument."
-  (cond ((funcall f nil) t)
-        (t nil)))
+  "Hypothetical function that checks if the function stops
+   when it's called with nil as the argument."
+  (declare (ignore f)))
 
 (defun last-try (x)
   "Function that breaks will-stop?.
@@ -1100,7 +1101,7 @@
   (and (will-stop? #'last-try)
        (eternity x)))
 
-;;; length_0
+;;; length 0
 ;;; Function that determines the length of
 ;;; the empty list and nothing else.
 (lambda (l)
@@ -1108,9 +1109,9 @@
         (t (add1
              (eternity (cdr l))))))
 
-;;; length_<=1
-;;; Contains definition of length_0 in last
-;;; cond clause, since length_0 wasn't defined.
+;;; length <=1
+;;; Contains definition of length 0 in last
+;;; cond clause, since length 0 wasn't defined.
 (lambda (l)
   (cond ((null? l) 0)
         (t (add1
@@ -1120,7 +1121,7 @@
                            (eternity (cdr l))))))
               (cdr l))))))
 
-;;; length_<=2
+;;; length <=2
 ;;; eternity just gets replaced with the
 ;;; next version of length.
 (lambda (l)
@@ -1137,10 +1138,116 @@
               (cdr l))))))
 
 ;;; Abstracting away length function
-;;; This one creates length_0
+;;; This one creates length 0
 ((lambda (length_)
    (lambda (l)
      (cond ((null? l) 0)
            (t (add1 (funcall length_ (cdr l)))))))
  #'eternity)
+
+;;; length <=1 in the same style.
+((lambda (f)
+   (lambda (l)
+     (cond ((null? l) 0)
+           (t (add 1 (funcall f (cdr l)))))))
+ ((lambda (g)
+    (lambda (l)
+      (cond ((null? l) 0)
+            (t (add1 (funcall g (cdr l)))))))
+  #'eternity))
+
+;;; length <=2
+((lambda (length_)
+   (lambda (l)
+     (cond ((null? l) 0)
+           (t (add1 (funcall length_ (cdr l)))))))
+ ((lambda (length_)
+    (lambda (l)
+      (cond ((null? l) 0)
+            (t (add1 (funcall length_ (cdr l)))))))
+  ((lambda (length_)
+     (lambda (l)
+       (cond ((null? l) 0)
+             (t (add1 (funcall length_ (cdr l)))))))
+   #'eternity)))
+
+;;; Abstract away a function that takes length as an
+;;; argument and returns a function that looks like length.
+;;; length 0
+((lambda (mk-length)
+   (funcall mk-length #'eternity))
+ (lambda (length_)
+   (lambda (l)
+     (cond ((null? l) 0)
+           (t (add1 (funcall length_ (cdr l))))))))
+
+;;; length <=1
+((lambda (mk-length)
+   (funcall mk-length
+     (funcall mk-length #'eternity)))
+ (lambda (length_)
+   (lambda (l)
+     (cond ((null? l) 0)
+           (t (add1 (funcall length_ (cdr l))))))))
+
+;;; length <=2
+((lambda (mk-length)
+   (funcall mk-length
+     (funcall mk-length
+       (funcall mk-length #'eternity))))
+ (lambda (length_)
+   (lambda (l)
+     (cond ((null? l) 0)
+           (t (add1 (funcall length_ (cdr l))))))))
+
+;;; Still length 0
+((lambda (mk-length)
+   (funcall mk-length mk-length))
+ (lambda (mk-length)
+   (lambda (l)
+     (cond ((null? l) 0)
+           (t (add1 (funcall mk-length (cdr l))))))))
+
+;;; Here is length function, finally.
+((lambda (mk-length)
+   (funcall mk-length mk-length))
+ (lambda (mk-length)
+   (lambda (l)
+     (cond ((null? l) 0)
+           (t (add1 ((lambda (x) (funcall
+                                   (funcall mk-length mk-length) x))
+                     (cdr l))))))))
+
+(lambda (le)
+  ((lambda (mk-length)
+     (funcall mk-length mk-length))
+   (lambda (mk-length)
+     (funcall le (lambda (x)
+                   (funcall (funcall mk-length mk-length) x))))))
+
+(defun Y (le)
+  ((lambda (f) (funcall f f))
+   (lambda (f)
+     (funcall le (lambda (x) (funcall (funcall f f) x))))))
+
+;;; Applying Y to a function to get a recursion
+(funcall (Y (lambda (length)
+              (lambda (l)
+                (cond ((null? l) 0)
+                      (t (add1 (funcall length (cdr l))))))))
+         '(1 2 3 4 5))
+
+;;;; What Is the Value of All of This?
+;;;; Chapter 10
+
+(defun new-entry (a b)
+  "Entry is a pair whose first list is a set.
+   Lists must be of equal length.
+   Examples:
+     ((appetizer entree beverage)
+      (pate boeuf vin))
+   and
+     ((beverage dessert)
+      (beer beer))"
+  (build a b))
 
