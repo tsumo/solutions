@@ -36,7 +36,7 @@
 (test '(lambda (x) x))
 (test '((lambda (x) x) 3))
 (test '(((lambda (x) x) (lambda (y) y)) 3)) ; return identity function from lambda, apply to number
-(test '(((lambda (!)        ; fibonacci sequence
+(test '(((lambda (!)        ; factorial of 5, recursive definition using Y-combinator
            (lambda (n)
              ((! !) n)))
          (lambda (!)

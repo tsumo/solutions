@@ -1,89 +1,84 @@
-var util = require('util')
 const { matches } = require('z')
 
-const format = (expr) => {
-    res = {func: expr[0]}
-    res.arg1 = expr[1]
-    if (expr.length >= 3) {
-        res.arg2 = expr[2]
-    }
-    if (expr.length >= 4) {
-        res.arg3 = expr[3]
-    }
-    return res
-}
-// console.log(format( ['if', 0, 1, 2] ))
-
 const test = (expr, expectation) => {
-    console.log(util.inspect(expr, false, null))
-    let res = eval_expr(expr, (x) => {throw `Lookup error: ${x} not bound`})
-    console.log('=>', res)
+    console.log('TESTING', expr)
+    let res = eval_expr(expr, x => {throw `Lookup error: ${x} not bound`})
+    console.log('RESULT', res)
     if (res !== expectation) {
-        console.log('=== TEST FAILED!!! ===')
+        console.error('=== TEST FAILED!!! ===')
     }
     console.log()
 }
 
-const eval_expr = (expr, env) => {
+const log = (l, ...xs) => {
+    console.log(' '.repeat(l), ...xs)
+}
+
+const eval_expr = (expr, env, l = 0) => {
     return matches(expr) (
         (n = Number) => n,
-        (e = {func: 'inc'}) => eval_expr(e.arg1, env) + 1,
-        (e = {func: 'dec'}) => eval_expr(e.arg1, env) - 1,
-        (e = {func: 'is_zero'}) => eval_expr(e.arg1, env) === 0,
-        (e = {func: 'mult'}) => eval_expr(e.arg1, env) * eval_expr(e.arg2, env),
-        (e = {func: 'if'}) => {
-            if (eval_expr(e.arg1, env)) {
-                return eval_expr(e.arg2, env)
+        (f = 'inc', [e]) => {
+            log(l, 'Incrementing', e);
+            return eval_expr(e, env, l+1) + 1
+        },
+        (f = 'dec', [e]) => {
+            log(l, 'Decrementing', e)
+            return eval_expr(e, env, l+1) - 1
+        },
+        (f = 'is_zero', [e]) => {
+            log(l, 'Testing if', e, 'is zero')
+            return eval_expr(e, env, l+1) === 0
+        },
+        (f = 'mult', e1, [e2]) => {
+            log(l, 'Multiplying', e1, 'and', e2)
+            return eval_expr(e1, env, l+1) * eval_expr(e2, env, l+1)
+        },
+        (f = 'if', t, c, [a]) => {
+            log(l, 'If', t, 'then', c, 'else', a)
+            if (eval_expr(t, env, l+1)) {
+                return eval_expr(c, env, l+1)
             } else {
-                return eval_expr(e.arg3, env)
+                return eval_expr(a, env, l+1)
             }
         },
-        (x = String) => env(x),
-        (e = {func: 'lambda'}) => (arg) => (eval_expr(e.arg2), (y) => e.arg1 == y ? arg : env(y)),
-        (e = Object) => eval_expr(e.func, env).apply(eval_expr(e.arg1, env)),
+        (x = String) => {
+            log(l, 'Lookup of', x)
+            return env(x)
+        },
+        (f = 'lambda', x, [body]) => {
+            log(l, 'Lambda with body', body)
+            return arg => eval_expr(body, y => x === y ? arg : env(y), l+1)
+        },
+        (rator, [rand]) => {
+            log(l, 'Application of', rator, 'to', rand)
+            return eval_expr(rator, env, l+1)(eval_expr(rand, env, l+1))
+        },
     )
 }
 
 test(4, 4)
-test({ func: 'inc', arg1: 4 }, 5)
-test({
-    func: 'inc',
-    arg1: { func: 'inc', arg1: 4 },
-}, 6)
-test({
-    func: 'dec',
-    arg1: 7,
-}, 6)
-test({
-    func: 'mult',
-    arg1: 4,
-    arg2: { func: 'inc', arg1: 3 },
-}, 16)
-test({
-    func: 'is_zero',
-    arg1: { func: 'dec', arg1: 1 },
-}, true)
-test({
-    func: 'if',
-    arg1: { func: 'is_zero', arg1: 0 },
-    arg2: { func: 'inc', arg1: 10 },
-    arg3: { func: 'dec', arg1: 10 },
-}, 11)
-test({
-    func: 'lambda',
-    arg1: 'x',
-    arg2: {
-        func: 'inc',
-        arg1: 2,
-    },
-})
-const a = {
-    func: 'lambda',
-    arg1: 'x',
-    arg2: {
-        func: 'inc',
-        arg1: 2,
-    },
-}
-const res = eval_expr(a, (x) => {throw `Lookup error: ${x} not bound`})
-console.log(res(0))
+test(['inc', 4], 5)
+test(['inc', ['inc', 4]], 6)
+test(['dec', 7], 6)
+test(['is_zero', ['dec', 1]], true)
+test(['mult', 4, ['inc', 2]], 12) // Application of multiple arguments
+test(['if', ['is_zero', 0], ['inc', 10], ['dec', 10]], 11) // Conditional evaluation
+test([['lambda', 'x', 'x'], 3], 3) // Identity function
+test([[['lambda', 'x', 'x'], ['lambda', 'y', 'y']], 3], 3) // Return identity function from lambda, apply it to number
+test([['lambda', 'x', ['inc', 'x']], 3], 4) // Apply lambda function
+test([['lambda', 'x', ['mult', 2, 'x']], 7], 14) // Doubling function
+
+// Factorial of 5. Recursive definition using Y-combinator
+test(
+    [[['lambda', '!',
+        ['lambda', 'n',
+            [['!', '!'], 'n']]],
+        ['lambda', '!',
+            ['lambda', 'n',
+                ['if', ['is_zero', 'n'],
+                    1,
+                    ['mult', 'n', [['!', '!'], ['dec', 'n']]]]]]],
+        5],
+    120
+)
+
