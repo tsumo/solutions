@@ -1251,3 +1251,209 @@
       (beer beer))"
   (build a b))
 
+(defun lookup-in-entry (name entry entry-f)
+  "Searches for name in the first list of entry
+   and returns corresponding element from the second
+   list of entry. If name is not found, runs entry-f.
+   Example call:
+   (lookup-in-entry
+     'entree
+     '((appetizer entree beverage)
+       (pate boeuf vin))
+     (lambda (name) (build 'not-found name)))"
+  (lookup-in-entry-help
+    name
+    (first entry)
+    (second entry)
+    entry-f))
+
+(defun lookup-in-entry-help (name names values entry-f)
+  "Recursive helper for lookup-in-entry"
+  (cond ((null? names) (funcall entry-f name))
+        ((eq? (car names) name) (car values))
+        (t (lookup-in-entry-help
+             name
+             (cdr names)
+             (cdr values)
+             entry-f))))
+
+(defun alias (name func)
+  (setf (fdefinition name) func))
+
+;;; A table (environment) is a list of entries.
+;;; Example:
+;;; (((appetizer entree beverage)
+;;;   (pate boeuf vin))
+;;;  ((bevarege desert)
+;;;   ((food is) (number one with us))))"
+(alias 'extend-table #'cons)
+
+(defun lookup-in-table (name table table-f)
+  (cond ((null? table) (funcall table-f name))
+        (t (lookup-in-entry
+             name
+             (car table)
+             (lambda (name)
+               (lookup-in-table name (cdr table) table-f))))))
+
+(defun expression-to-action (e)
+  "Produces correct action (function) for each
+   possible S-expression.
+   There are six types of expressions:
+     *const
+     *quote
+     *identifier
+     *lambda
+     *cond
+     *application"
+  (cond ((atom? e) (atom-to-action e))
+        (t (list-to-action e))))
+
+(defun atom-to-action (e)
+  (cond ((number? e) #'*const)
+        ((eq? e t) #'*const)
+        ((eq? e nil) #'*const)
+        ((eq? e 'cons) #'*const)
+        ((eq? e 'car) #'*const)
+        ((eq? e 'cdr) #'*const)
+        ((eq? e 'null?) #'*const)
+        ((eq? e 'eq?) #'*const)
+        ((eq? e 'atom?) #'*const)
+        ((eq? e 'zero?) #'*const)
+        ((eq? e 'add1) #'*const)
+        ((eq? e 'sub1) #'*const)
+        ((eq? e 'number?) #'*const)
+        (t #'*identifier)))
+
+(defun list-to-action (e)
+  (cond ((atom? (car e))
+         (cond ((eq? (car e) 'quote) #'*quote)
+               ((eq? (car e) 'lambda) #'*lambda)
+               ((eq? (car e) 'cond) #'*cond)
+               (t #'*application)))
+        (t #'*application)))
+
+(defun value-e (e)
+  "Approximates eval function"
+  (meaning e nil))
+
+(defun meaning (e table)
+  (funcall (expression-to-action e) e table))
+
+(defun *const (e table)
+  (declare (ignore table))
+  (cond ((number? e) e)
+        ((eq? e t) t)
+        ((eq? e nil) nil)
+        (t (build 'primitive e))))
+
+(defun *quote (e table)
+  (declare (ignore table))
+  (text-of e))
+
+(alias 'text-of #'second)
+
+(defun *identifier (e table)
+  (lookup-in-table e table #'initial-table))
+
+(defun initial-table (name)
+  (declare (ignore name))
+  (car nil))
+
+(defun *lambda (e table)
+  "Example result:
+   (non-primitive ( (((y z)((8) 9))) (x) (cons x y) ))
+                    ^                ^   ^
+                  table         formals  body"
+  (build 'non-primitive (cons table (cdr e))))
+
+(alias 'table-of #'first)
+
+(alias 'formals-of #'second)
+
+(alias 'body-of #'third)
+
+(defun evcon (lines table)
+  "Evaluate cond expression. It considers each line in turn.
+   If question part on the left is false it looks
+   at the rest of the lines. Otherwise it answers the right part."
+  (cond ((else? (question-of (car lines)))
+         (meaning (answer-of (car lines)) table))
+        ((meaning (question-of (car lines)) table)
+         (meaning (answer-of (car lines)) table))
+        (t (evcon (cdr lines) table))))
+
+(defun else? (x)
+  (cond ((atom? x) (eq? x t))
+        (t nil)))
+
+(alias 'question-of #'first)
+
+(alias 'answer-of #'second)
+
+(defun *cond (e table)
+  (evcon (cond-lines-of e) table))
+
+(alias 'cond-lines-of #'cdr)
+
+(defun evlis (args table)
+  "Takes a list of arguments and a table and returns
+   list composed of the meaning of each argument.
+   Used to evaluate function arguments before application."
+  (cond ((null? args) nil)
+        (t (cons (meaning (car args) table)
+                 (evlis (cdr args) table)))))
+
+(defun *application (e table)
+  (apply-f (meaning (function-of e) table)
+           (evlis (arguments-of e) table)))
+
+(alias 'function-of #'car)
+
+(alias 'arguments-of #'cdr)
+
+(defun primitive? (l)
+  (eq? (first l) 'primitive))
+
+(defun non-primitive? (l)
+  (eq? (first l) 'non-primitive))
+
+(defun apply-f (fun vals)
+  (cond ((primitive? fun) (apply-primitive
+                            (second fun)
+                            vals))
+        ;; List (table formals body) is called
+        ;; closure record
+        ((non-primitive? fun) (apply-closure
+                                (second fun)
+                                vals))))
+
+(defun apply-primitive (name vals)
+  (cond ((eq? name 'cons) (cons (first vals) (second vals)))
+        ((eq? name 'car) (car (first vals)))
+        ((eq? name 'cdr) (cdr (first vals)))
+        ((eq? name 'null?) (null? (first vals)))
+        ((eq? name 'eq?) (eq? (first vals) (second vals)))
+        ((eq? name 'atom?) (:atom? (first vals)))
+        ((eq? name 'zero?) (zero? (first vals)))
+        ((eq? name 'add1) (add1 (first vals)))
+        ((eq? name 'sub1) (sub1 (first vals)))
+        ((eq? name 'number?) (number? (first vals)))))
+
+(defun :atom? (x)
+  (cond ((atom? x) t)
+        ((null? x) nil)
+        ((eq? (car x) 'primitive) t)
+        ((eq? (car x) 'non-primitive) t)
+        (t nil)))
+
+(defun apply-closure (closure vals)
+  "Applying a closure to a list of values is the same as finding
+   the meaning of the closure's body with its table extended
+   by an entry of the form (formals values)
+   where formals is the formals of the closure
+   and values is the result of evlis."
+  (meaning (body-of closure)
+           (extend-table (new-entry (formals-of closure) vals)
+                         (table-of closure))))
+
