@@ -120,6 +120,13 @@ def divisors(n):
     return divisors
 
 
+def proper_divisors(n):
+    """
+    Proper divisor of n is a divisor that is not equal to n.
+    """
+    return divisors(n) - {n}
+
+
 def digit_sum(n):
     """
     Sum of all digits in a number.
