@@ -17,24 +17,16 @@ four million, find the sum of the even-valued terms.
 import pe_utils
 
 
-def even_fib(lim):
-    s = 0
-    i = 0
-    j = 1
-    while i < lim:
-        if i % 2 == 0:
-            s += i
-        i, j = next_fib(i, j)
-    return s
+def problem1(limit):
+    gen = pe_utils.fibonacci_generator()
+    result = 0
+    x = next(gen)
+    while x < limit:
+        if x % 2 == 0:
+            result += x
+        x = next(gen)
+    return result
 
 
-def next_fib(i, j):
-    """
-    Receives pair of fib numbers
-    and returns them shifted.
-    """
-    return j, j + i
-
-
-pe_utils.test(even_fib, [4000000], 4613732)
+pe_utils.test(problem1, [4000000], 4613732)
 

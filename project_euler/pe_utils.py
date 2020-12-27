@@ -137,6 +137,7 @@ def digit_sum(n):
         n //= 10
     return s
 
+
 def perfect_numbers(n):
     """
     Finds all perfect, deficient and abundant numbers up to a limit.
@@ -153,4 +154,15 @@ def perfect_numbers(n):
         else:
             perfect.append(i)
     return perfect, deficient, abundant
+
+
+def fibonacci_generator():
+    """
+    Generates fibonacci sequence.
+    """
+    x = 0
+    y = 1
+    while True:
+        yield x
+        x, y = y, x + y
 
