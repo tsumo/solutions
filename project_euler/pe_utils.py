@@ -137,3 +137,20 @@ def digit_sum(n):
         n //= 10
     return s
 
+def perfect_numbers(n):
+    """
+    Finds all perfect, deficient and abundant numbers up to a limit.
+    """
+    perfect = []
+    deficient = []
+    abundant = []
+    for i in range(1, n + 1):
+        div_sum = sum(proper_divisors(i))
+        if div_sum < i:
+            deficient.append(i)
+        elif div_sum > i:
+            abundant.append(i)
+        else:
+            perfect.append(i)
+    return perfect, deficient, abundant
+
