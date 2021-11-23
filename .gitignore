@@ -3,4 +3,5 @@ __pycache__/
 .stack-work/
 .exercism/
 *.fasl
+.DS_Store
 
