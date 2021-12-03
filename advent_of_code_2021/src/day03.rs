@@ -2,9 +2,9 @@ use crate::utils;
 
 fn get_bit_at(a: i32, n: u8) -> i32 {
   if (a >> n & 1) == 0 {
-    1
-  } else {
     -1
+  } else {
+    1
   }
 }
 
@@ -16,18 +16,18 @@ pub fn first() -> i32 {
   let mut r = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
   for number in numbers {
-    r.0 -= get_bit_at(number, 11);
-    r.1 -= get_bit_at(number, 10);
-    r.2 -= get_bit_at(number, 9);
-    r.3 -= get_bit_at(number, 8);
-    r.4 -= get_bit_at(number, 7);
-    r.5 -= get_bit_at(number, 6);
-    r.6 -= get_bit_at(number, 5);
-    r.7 -= get_bit_at(number, 4);
-    r.8 -= get_bit_at(number, 3);
-    r.9 -= get_bit_at(number, 2);
-    r.10 -= get_bit_at(number, 1);
-    r.11 -= get_bit_at(number, 0);
+    r.0 += get_bit_at(number, 11);
+    r.1 += get_bit_at(number, 10);
+    r.2 += get_bit_at(number, 9);
+    r.3 += get_bit_at(number, 8);
+    r.4 += get_bit_at(number, 7);
+    r.5 += get_bit_at(number, 6);
+    r.6 += get_bit_at(number, 5);
+    r.7 += get_bit_at(number, 4);
+    r.8 += get_bit_at(number, 3);
+    r.9 += get_bit_at(number, 2);
+    r.10 += get_bit_at(number, 1);
+    r.11 += get_bit_at(number, 0);
   }
 
   let g0 = if r.0 > 0 { 1 } else { 0 };
