@@ -1,15 +1,13 @@
-use std::fs;
+use crate::utils;
 
 pub fn first() -> i32 {
-  let input = fs::read_to_string("src/day01.input").expect("Cannot read file");
+  let numbers = utils::parse_file_to_numbers("src/day01.input");
 
-  let numbers = input.lines().map(|s| s.parse::<i32>().unwrap());
-
-  let res = numbers.fold((0, -1), |acc, c| {
-    if acc.0 < c {
-      (c, acc.1 + 1)
+  let res = numbers.iter().fold((0, -1), |acc, c| {
+    if acc.0 < *c {
+      (*c, acc.1 + 1)
     } else {
-      (c, acc.1)
+      (*c, acc.1)
     }
   });
 
@@ -19,9 +17,7 @@ pub fn first() -> i32 {
 }
 
 pub fn second() -> i32 {
-  let input = fs::read_to_string("src/day01.input").expect("Cannot read file");
-
-  let numbers: Vec<i32> = input.lines().map(|s| s.parse::<i32>().unwrap()).collect();
+  let numbers = utils::parse_file_to_numbers("src/day01.input");
 
   let mut res: i32 = -1;
   let mut prev_sum: i32 = 0;

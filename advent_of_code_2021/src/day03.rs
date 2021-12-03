@@ -1,4 +1,4 @@
-use std::fs;
+use crate::utils;
 
 fn get_bit_at(a: i32, n: u8) -> i32 {
   if (a >> n & 1) == 0 {
@@ -9,9 +9,9 @@ fn get_bit_at(a: i32, n: u8) -> i32 {
 }
 
 pub fn first() -> i32 {
-  let input = fs::read_to_string("src/day03.input").expect("Cannot read file");
+  let lines = utils::parse_file_to_lines("src/day03.input");
 
-  let numbers = input.lines().map(|s| i32::from_str_radix(s, 2).unwrap());
+  let numbers = lines.iter().map(|s| i32::from_str_radix(s, 2).unwrap());
 
   let r1 = numbers.clone().fold(0, |acc, c| acc - get_bit_at(c, 11));
   let r2 = numbers.clone().fold(0, |acc, c| acc - get_bit_at(c, 10));

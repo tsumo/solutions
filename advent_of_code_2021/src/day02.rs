@@ -1,9 +1,7 @@
-use std::fs;
+use crate::utils;
 
 pub fn first() -> i32 {
-  let input = fs::read_to_string("src/day02.input").expect("Cannot read file");
-
-  let lines = input.lines();
+  let lines = utils::parse_file_to_lines("src/day02.input");
 
   let mut position: i32 = 0;
   let mut depth: i32 = 0;
@@ -28,9 +26,7 @@ pub fn first() -> i32 {
 }
 
 pub fn second() -> i32 {
-  let input = fs::read_to_string("src/day02.input").expect("Cannot read file");
-
-  let lines = input.lines();
+  let lines = utils::parse_file_to_lines("src/day02.input");
 
   let mut position: i32 = 0;
   let mut depth: i32 = 0;
