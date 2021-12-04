@@ -4,7 +4,13 @@ fn set_bit_at(a: &mut i32, i: u8) {
   *a |= 1 << i;
 }
 
-fn more_ones_at_index(numbers: &Vec<i32>, i: u8) -> bool {
+enum Count {
+  ONES,
+  ZEROS,
+  EQUAL,
+}
+
+fn count_bits_at_index(numbers: &Vec<i32>, i: u8) -> Count {
   let mask = 1 << i;
   let mut ones = 0;
   for n in numbers {
@@ -12,7 +18,14 @@ fn more_ones_at_index(numbers: &Vec<i32>, i: u8) -> bool {
       ones += 1;
     }
   }
-  ones >= (numbers.len() / 2)
+  let half = numbers.len() / 2;
+  if ones > half {
+    Count::ONES
+  } else if ones < half {
+    Count::ZEROS
+  } else {
+    Count::EQUAL
+  }
 }
 
 pub fn first() -> i32 {
@@ -27,10 +40,10 @@ pub fn first() -> i32 {
   let mut epsilon = 0;
 
   for i in 0..12 {
-    if more_ones_at_index(&numbers, i) {
-      set_bit_at(&mut gamma, i)
-    } else {
-      set_bit_at(&mut epsilon, i)
+    match count_bits_at_index(&numbers, i) {
+      Count::EQUAL => set_bit_at(&mut gamma, i),
+      Count::ONES => set_bit_at(&mut gamma, i),
+      Count::ZEROS => set_bit_at(&mut epsilon, i),
     }
   }
 
