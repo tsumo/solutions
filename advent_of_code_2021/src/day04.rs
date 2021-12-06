@@ -81,3 +81,55 @@ pub fn first() -> i32 {
 
   panic!("No winning board")
 }
+
+pub fn second() -> i32 {
+  let lines = utils::parse_file_to_lines("src/day04.input");
+  let numbers: Vec<i32> = lines[0]
+    .split(",")
+    .map(|s| s.parse::<i32>().unwrap())
+    .collect();
+
+  let size = parse_line(&lines[2]).len();
+
+  let boards_cnt = (lines.len() - 2) / (size + 1);
+
+  let mut boards = Vec::<i32>::new();
+
+  for i in 0..boards_cnt {
+    for j in 0..size {
+      boards.extend(parse_line(&lines[i * 6 + j + 2]))
+    }
+  }
+
+  let mut marks = vec![false; boards.len()];
+
+  let mut winning_boards = vec![false; boards_cnt];
+
+  for n in numbers {
+    for (i, x) in boards.iter().enumerate() {
+      if *x == n {
+        marks[i] = true;
+        for b in 0..boards_cnt {
+          if check_win(&marks, b, size) {
+            winning_boards[b] = true;
+            let mut win_cnt = 0;
+            for w in &winning_boards {
+              if *w {
+                win_cnt += 1;
+              }
+            }
+            if win_cnt == boards_cnt {
+              let res = sum_unmarked(&boards, &marks, b, size) * n;
+
+              assert_eq!(res, 4920);
+
+              return res;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  panic!("Oops")
+}
