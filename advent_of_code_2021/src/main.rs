@@ -19,4 +19,5 @@ fn main() {
     println!("Day 4.2: {}", day04::second());
     println!();
     println!("Day 5.1: {}", day05::first());
+    println!("Day 5.2: {}", day05::second());
 }
